@@ -98,21 +98,11 @@ async def stirling_health() -> dict:
 
 
 if __name__ == "__main__":
-    import asyncio
-
     log.info(
         "Starting Stirling-PDF MCP on %s:%d → backend %s",
         SETTINGS.host,
         SETTINGS.port,
         SETTINGS.stirling_url,
     )
-    # Use run_http_async directly — handles host/port kwargs cleanly across
-    # FastMCP 2.x and 3.x. The plain `run()` wrapper's **kwargs forwarding
-    # broke in 3.x (host/port rejected as 'unexpected').
-    asyncio.run(
-        mcp.run_http_async(
-            transport="streamable-http",
-            host=SETTINGS.host,
-            port=SETTINGS.port,
-        )
-    )
+    # FastMCP 3.x accepts host/port via **kwargs to run(); proven on flux-mcp.
+    mcp.run(transport="streamable-http", host=SETTINGS.host, port=SETTINGS.port)
