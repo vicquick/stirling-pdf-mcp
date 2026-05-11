@@ -87,6 +87,10 @@ def _register_layers() -> None:
         titleblock,
         submittal,
         visual_diff,
+        ifc_refs,
+        qgis_layer,
+        rfi_packet,
+        render_report,
     )
 
 
