@@ -97,12 +97,18 @@ class StirlingClient:
         path: str,
         *,
         files: list[tuple[str, tuple[str, BinaryIO, str]]] | None = None,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | list[tuple[str, str]] | None = None,
         params: dict[str, Any] | None = None,
     ) -> httpx.Response:
         """Single HTTP attempt with retry wrapper. Raises StirlingError on non-2xx final."""
         async with self._semaphore:
-            log.debug("Stirling %s %s data=%s files=%d", method, path, list((data or {}).keys()), len(files or []))
+            if isinstance(data, dict):
+                field_names = list(data.keys())
+            elif isinstance(data, list):
+                field_names = sorted({k for k, _ in data})
+            else:
+                field_names = []
+            log.debug("Stirling %s %s fields=%s files=%d", method, path, field_names, len(files or []))
             resp = await self._client.request(
                 method,
                 path,
