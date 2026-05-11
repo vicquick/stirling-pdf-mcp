@@ -20,7 +20,11 @@ log = logging.getLogger("stirling_mcp.composites.aec.drawing_set")
 # AEC sheet numbering convention — A-101, A_101, A101, M-201.1, etc.
 # Discipline letter(s) + optional dash/underscore + 3-4 digit number, optionally
 # a decimal suffix (A-101.2 = sub-sheet of A-101).
-SHEET_NUM_RE = re.compile(r"\b([A-Z]{1,2})[-_]?(\d{2,4}(?:\.\d+)?)\b")
+# Sheet numbers in filenames like "03-drawing-A_101_r2.pdf", "M-201.1", "A101"
+# Letter or 1-2 letters, optional `-` or `_` separator, 2-4 digits, optional .N suffix.
+# Use (?:^|[^A-Z]) lookbehind so "drawing-A" matches; the previous \b alone
+# wouldn't match `A_101` cleanly because underscore is a word char.
+SHEET_NUM_RE = re.compile(r"(?:^|[^A-Za-z0-9])([A-Z]{1,2})[-_]?(\d{2,4}(?:\.\d+)?)(?:[^0-9]|$)")
 # Revision must come AFTER an explicit "rev" / "r" / "revision" tag — bare
 # letters near filenames give too many false positives ("rev2" is OK,
 # "(case_a)" is not).

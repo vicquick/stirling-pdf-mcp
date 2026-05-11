@@ -16,6 +16,9 @@ from __future__ import annotations
 
 import logging
 
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
 from stirling_mcp.app import mcp
 from stirling_mcp.config import SETTINGS
 
@@ -69,6 +72,13 @@ def _register_layers() -> None:
         memory,
         expense,
         book,
+        clean_scan,
+        anonymize,
+        extract_tables,
+        split_smart,
+        audio,
+        translate,
+        audiobook,
     )
 
     # Layer 3 — AEC + cross-MCP
@@ -76,10 +86,18 @@ def _register_layers() -> None:
         drawing_set,
         titleblock,
         submittal,
+        visual_diff,
     )
 
 
 _register_layers()
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def http_health(request: Request) -> JSONResponse:
+    """HTTP healthcheck (Coolify/Docker). Always 200 — backend probe is the
+    `stirling_health` MCP tool."""
+    return JSONResponse({"status": "ok", "name": "stirling-pdf-mcp"})
 
 
 @mcp.tool()

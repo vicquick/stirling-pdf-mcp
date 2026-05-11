@@ -36,3 +36,5 @@ coverage/
 tmp/
 temp/
 __pycache__/
+data/
+output/

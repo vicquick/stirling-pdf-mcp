@@ -9,3 +9,4 @@ aiofiles>=23.2.0
 PyYAML>=6.0
 python-multipart>=0.0.9
 qrcode[pil]>=7.4
+Pillow>=10.0.0
