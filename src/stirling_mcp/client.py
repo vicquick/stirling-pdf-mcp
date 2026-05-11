@@ -59,24 +59,28 @@ class StirlingClient:
     """Async client. Construct one per server process; reuse for all calls."""
 
     def __init__(self) -> None:
-        self._semaphore = asyncio.Semaphore(SETTINGS.max_concurrent_requests)
-        timeout = httpx.Timeout(
+        # The semaphore is created lazily on first use so that __init__ can
+        # run outside an event loop without warnings. httpx clients are
+        # created PER REQUEST rather than as a long-lived singleton — that
+        # pattern was triggering "Attempted to send a sync request with an
+        # AsyncClient instance" under fastmcp's anyio event loop in httpx 0.28+.
+        self._semaphore: asyncio.Semaphore | None = None
+        self._headers = {"X-API-KEY": SETTINGS.stirling_api_key} if SETTINGS.stirling_api_key else {}
+        self._timeout = httpx.Timeout(
             connect=10.0,
             read=SETTINGS.request_timeout,
             write=SETTINGS.request_timeout,
             pool=10.0,
         )
-        headers = {}
-        if SETTINGS.stirling_api_key:
-            headers["X-API-KEY"] = SETTINGS.stirling_api_key
-        self._client = httpx.AsyncClient(
-            base_url=SETTINGS.stirling_url,
-            timeout=timeout,
-            headers=headers,
-        )
+
+    def _get_sem(self) -> asyncio.Semaphore:
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(SETTINGS.max_concurrent_requests)
+        return self._semaphore
 
     async def aclose(self) -> None:
-        await self._client.aclose()
+        # Nothing to close — clients are per-request.
+        pass
 
     async def _do_request(
         self,
@@ -91,7 +95,7 @@ class StirlingClient:
         last_exc: Exception | None = None
         delay = 1.0
         for attempt in range(3):
-            async with self._semaphore:
+            async with self._get_sem():
                 if isinstance(data, dict):
                     field_names = list(data.keys())
                 elif isinstance(data, list):
@@ -103,9 +107,17 @@ class StirlingClient:
                     method, path, field_names, len(files or []), attempt + 1,
                 )
                 try:
-                    resp = await self._client.request(
-                        method, path, files=files, data=data, params=params
-                    )
+                    async with httpx.AsyncClient(
+                        base_url=SETTINGS.stirling_url,
+                        timeout=self._timeout,
+                        headers=self._headers,
+                    ) as client:
+                        resp = await client.request(
+                            method, path, files=files, data=data, params=params
+                        )
+                        # Eagerly read the body before the client context exits,
+                        # since callers consume resp.content / resp.text after.
+                        await resp.aread()
                 except (httpx.TimeoutException, httpx.NetworkError) as e:
                     last_exc = e
                     if attempt >= 2:
@@ -267,10 +279,8 @@ class StirlingClient:
         out_name = f"{slug}_{uuid.uuid4().hex[:8]}{output_suffix}"
         out_path = SETTINGS.output_dir / out_name
 
-        # Stream response to disk
-        with out_path.open("wb") as f:
-            async for chunk in resp.aiter_bytes():
-                f.write(chunk)
+        # Body already buffered (aread() in _do_request); write all at once.
+        out_path.write_bytes(resp.content)
 
         size_bytes = out_path.stat().st_size
         log.info(
