@@ -88,7 +88,7 @@ class StirlingClient:
         path: str,
         *,
         files: list[tuple[str, tuple[str, BinaryIO, str]]] | None = None,
-        data: dict[str, Any] | list[tuple[str, str]] | None = None,
+        data: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
     ) -> httpx.Response:
         """One async request with explicit exponential-backoff retry on transient 5xx."""
@@ -96,12 +96,7 @@ class StirlingClient:
         delay = 1.0
         for attempt in range(3):
             async with self._get_sem():
-                if isinstance(data, dict):
-                    field_names = list(data.keys())
-                elif isinstance(data, list):
-                    field_names = sorted({k for k, _ in data})
-                else:
-                    field_names = []
+                field_names = list(data.keys()) if isinstance(data, dict) else []
                 log.debug(
                     "Stirling %s %s fields=%s files=%d attempt=%d",
                     method, path, field_names, len(files or []), attempt + 1,
@@ -215,31 +210,31 @@ class StirlingClient:
         }
 
     @staticmethod
-    def _sanitise_form(d: dict[str, Any]) -> list[tuple[str, str]]:
-        """Coerce a dict into a list of (key, value) form pairs.
+    def _sanitise_form(d: dict[str, Any]) -> dict[str, Any]:
+        """Coerce values into httpx-friendly form shapes.
 
-        Returns a *list of tuples* rather than a dict because some Stirling
-        endpoints (auto-redact, ocr languages) expect the same field name to
-        repeat once per value — Spring binds these into a List<String>. A dict
-        would collapse them to one key, and JSON-encoding the list would make
-        Stirling parse the literal ``[...]`` as one element.
+        Returns a dict where list-valued keys keep their lists — httpx 0.28+
+        serializes ``data={"key": [v1, v2]}`` as repeated form fields
+        ``key=v1&key=v2``, which Spring binds into a ``List<String>``.
+        DO NOT return a list of (k, v) tuples here: httpx 0.28 has a bug
+        where ``data=list_of_tuples`` falsely triggers a "sync request on
+        AsyncClient" RuntimeError.
         """
         import json
 
-        out: list[tuple[str, str]] = []
+        out: dict[str, Any] = {}
         for k, v in d.items():
             if v is None:
                 continue
             if isinstance(v, bool):
-                out.append((k, "true" if v else "false"))
+                out[k] = "true" if v else "false"
             elif isinstance(v, list):
-                # Repeat the field per element so Spring binds it as a list
-                for item in v:
-                    out.append((k, str(item)))
+                # Keep the list — httpx repeats the field per element
+                out[k] = [str(item) for item in v]
             elif isinstance(v, dict):
-                out.append((k, json.dumps(v)))
+                out[k] = json.dumps(v)
             else:
-                out.append((k, str(v)))
+                out[k] = str(v)
         return out
 
     async def _save_response(
