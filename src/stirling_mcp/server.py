@@ -98,19 +98,21 @@ async def stirling_health() -> dict:
 
 
 if __name__ == "__main__":
-    import os
+    import asyncio
 
-    # FastMCP <0.5 reads host/port from FASTMCP_HOST / FASTMCP_PORT env vars
-    os.environ.setdefault("FASTMCP_HOST", SETTINGS.host)
-    os.environ.setdefault("FASTMCP_PORT", str(SETTINGS.port))
     log.info(
         "Starting Stirling-PDF MCP on %s:%d → backend %s",
         SETTINGS.host,
         SETTINGS.port,
         SETTINGS.stirling_url,
     )
-    # Pass host/port if FastMCP accepts them, else they're already in env
-    try:
-        mcp.run(transport="streamable-http", host=SETTINGS.host, port=SETTINGS.port)
-    except TypeError:
-        mcp.run(transport="streamable-http")
+    # Use run_http_async directly — handles host/port kwargs cleanly across
+    # FastMCP 2.x and 3.x. The plain `run()` wrapper's **kwargs forwarding
+    # broke in 3.x (host/port rejected as 'unexpected').
+    asyncio.run(
+        mcp.run_http_async(
+            transport="streamable-http",
+            host=SETTINGS.host,
+            port=SETTINGS.port,
+        )
+    )
