@@ -67,6 +67,8 @@ def _register_layers() -> None:
         stamps,
         ai_summary,
         memory,
+        expense,
+        book,
     )
 
     # Layer 3 — AEC + cross-MCP
