@@ -29,7 +29,9 @@ ENV OUTPUT_DIR=/output \
 
 EXPOSE 8087
 
+# TCP-only healthcheck — port 8087 listens once FastMCP is up. No HTTP path
+# probe because FastMCP < 1.0 doesn't expose custom_route().
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -fsS http://localhost:8087/health || exit 1
+    CMD python3 -c "import socket; s=socket.socket(); s.settimeout(5); s.connect(('localhost',8087)); s.close()" || exit 1
 
 CMD ["python", "-m", "stirling_mcp.server"]
