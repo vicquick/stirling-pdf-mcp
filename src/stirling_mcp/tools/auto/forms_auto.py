@@ -9,7 +9,7 @@ from stirling_mcp.client import get_client
 from stirling_mcp.server import mcp
 
 @mcp.tool()
-async def forms_modify_fields(
+async def forms_form_modify_fields(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -28,7 +28,7 @@ async def forms_modify_fields(
 
 
 @mcp.tool()
-async def forms_fields(
+async def forms_form_fields(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -47,7 +47,7 @@ async def forms_fields(
 
 
 @mcp.tool()
-async def forms_fields_with_coordinates(
+async def forms_form_fields_with_coordinates(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -66,7 +66,7 @@ async def forms_fields_with_coordinates(
 
 
 @mcp.tool()
-async def forms_extract_xlsx(
+async def forms_form_extract_xlsx(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -85,7 +85,7 @@ async def forms_extract_xlsx(
 
 
 @mcp.tool()
-async def forms_extract_csv(
+async def forms_form_extract_csv(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -104,7 +104,7 @@ async def forms_extract_csv(
 
 
 @mcp.tool()
-async def forms_delete_fields(
+async def forms_form_delete_fields(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:

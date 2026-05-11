@@ -9,7 +9,7 @@ from stirling_mcp.client import get_client
 from stirling_mcp.server import mcp
 
 @mcp.tool()
-async def filter__filter_page_rotation(
+async def filter__filter_filter_page_rotation(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -28,7 +28,7 @@ async def filter__filter_page_rotation(
 
 
 @mcp.tool()
-async def filter__filter_file_size(
+async def filter__filter_filter_file_size(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -47,7 +47,7 @@ async def filter__filter_file_size(
 
 
 @mcp.tool()
-async def filter__filter_contains_text(
+async def filter__filter_filter_contains_text(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -66,7 +66,7 @@ async def filter__filter_contains_text(
 
 
 @mcp.tool()
-async def filter__filter_contains_image(
+async def filter__filter_filter_contains_image(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:

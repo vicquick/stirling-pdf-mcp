@@ -128,14 +128,23 @@ def slugify(text: str) -> str:
 
 
 def tool_name_for(path: str, method: str, tag: str) -> str:
-    """Generate a stable, unique MCP tool name."""
-    last = path.strip("/").split("/")[-1]
+    """Generate a stable, unique MCP tool name.
+
+    Strategy: tag prefix + slug of the **full path minus /api/v1/**. Including
+    the full subpath avoids collisions when many endpoints end with the same
+    last segment (e.g. `/convert/url/pdf`, `/convert/img/pdf`, `/convert/file/pdf`
+    all end in `pdf`).
+    """
+    relevant = path.replace("/api/v1/", "").replace("/api/v1", "")
+    op_slug = slugify(relevant)
     tag_slug = slugify(tag)
-    op_slug = slugify(last)
-    # Method only suffixed for non-POST
+    # Drop tag prefix if the path already starts with it (common Stirling case)
+    if op_slug.startswith(tag_slug + "_"):
+        op_slug = op_slug[len(tag_slug) + 1 :]
+    name = f"{tag_slug}_{op_slug}"
     if method.lower() != "post":
-        return f"{tag_slug}_{op_slug}_{method.lower()}"
-    return f"{tag_slug}_{op_slug}"
+        name = f"{name}_{method.lower()}"
+    return name
 
 
 def docstring_for(op: dict, path: str, method: str) -> str:

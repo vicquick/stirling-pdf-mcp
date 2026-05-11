@@ -9,7 +9,7 @@ from stirling_mcp.client import get_client
 from stirling_mcp.server import mcp
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_vector_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -28,7 +28,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_text_editor_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -47,7 +47,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_svg_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -66,7 +66,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_xml(
+async def convert_pdf_xml(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -85,7 +85,7 @@ async def convert_xml(
 
 
 @mcp.tool()
-async def convert_xlsx(
+async def convert_pdf_xlsx(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -104,7 +104,7 @@ async def convert_xlsx(
 
 
 @mcp.tool()
-async def convert_vector(
+async def convert_pdf_vector(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -123,7 +123,7 @@ async def convert_vector(
 
 
 @mcp.tool()
-async def convert_text(
+async def convert_pdf_text(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -142,7 +142,7 @@ async def convert_text(
 
 
 @mcp.tool()
-async def convert_text_editor(
+async def convert_pdf_text_editor(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -161,7 +161,7 @@ async def convert_text_editor(
 
 
 @mcp.tool()
-async def convert_by(
+async def convert_pdf_text_editor_partial_by(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -180,7 +180,7 @@ async def convert_by(
 
 
 @mcp.tool()
-async def convert_metadata(
+async def convert_pdf_text_editor_metadata(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -199,7 +199,7 @@ async def convert_metadata(
 
 
 @mcp.tool()
-async def convert_by(
+async def convert_pdf_text_editor_clear_cache_by(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -218,7 +218,7 @@ async def convert_by(
 
 
 @mcp.tool()
-async def convert_presentation(
+async def convert_pdf_presentation(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -237,7 +237,7 @@ async def convert_presentation(
 
 
 @mcp.tool()
-async def convert_html(
+async def convert_pdf_html(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -256,7 +256,7 @@ async def convert_html(
 
 
 @mcp.tool()
-async def convert_epub(
+async def convert_pdf_epub(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -275,7 +275,7 @@ async def convert_epub(
 
 
 @mcp.tool()
-async def convert_cbz(
+async def convert_pdf_cbz(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -294,7 +294,7 @@ async def convert_cbz(
 
 
 @mcp.tool()
-async def convert_cbr(
+async def convert_pdf_cbr(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -313,7 +313,7 @@ async def convert_cbr(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_eml_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -332,7 +332,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_ebook_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -351,7 +351,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_cbz_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -370,7 +370,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_pdf(
+async def convert_cbr_pdf(
     input_files: list[str] | None = None,
     form_data: dict | None = None,
 ) -> dict:
@@ -389,7 +389,7 @@ async def convert_pdf(
 
 
 @mcp.tool()
-async def convert_by_get(jobId: str, pageNumber: str) -> dict:
+async def convert_pdf_text_editor_page_by_by_get(jobId: str, pageNumber: str) -> dict:
     """Extract single page from cached PDF for text editor
     
     Retrieves a single page's content from a previously cached PDF document for the text editor tool. Requires prior call to /pdf/text-editor/metadata. The jobId must belong to the authenticated user. Output:JSON
@@ -400,7 +400,7 @@ async def convert_by_get(jobId: str, pageNumber: str) -> dict:
 
 
 @mcp.tool()
-async def convert_by_get(jobId: str, pageNumber: str) -> dict:
+async def convert_pdf_text_editor_fonts_by_by_get(jobId: str, pageNumber: str) -> dict:
     """Extract fonts used by a single cached page for text editor
     
     Retrieves the font payloads used by a single page from a previously cached PDF document. Requires prior call to /pdf/text-editor/metadata. The jobId must belong to the authenticated user. Output:JSON
