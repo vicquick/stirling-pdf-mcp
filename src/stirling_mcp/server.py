@@ -56,6 +56,18 @@ def _register_layers() -> None:
         ai,
     )
 
+    # Auto-generated raw wrappers (Layer 1 fill-out)
+    from stirling_mcp.tools.auto import (  # noqa: F401
+        general_auto,
+        misc_auto,
+        security_auto,
+        convert_auto,
+        forms_auto,
+        filter_auto,
+        analysis_auto,
+        pipeline_auto,
+    )
+
     # Layer 2 — generic composites
     from stirling_mcp.tools.composites import (  # noqa: F401
         invoice,
@@ -64,11 +76,20 @@ def _register_layers() -> None:
         sign,
         merge,
         compare,
+        legal,
+        form_batch,
+        print_web,
+        share,
+        stamps,
+        ai_summary,
+        memory,
     )
 
-    # Layer 3 — AEC + cross-MCP (stubs until v0.3)
+    # Layer 3 — AEC + cross-MCP
     from stirling_mcp.tools.composites.aec import (  # noqa: F401
         drawing_set,
+        titleblock,
+        submittal,
     )
 
 
