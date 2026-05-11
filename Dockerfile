@@ -1,33 +1,35 @@
-# Use Node.js LTS image
-FROM node:20-slim
+FROM python:3.12-slim
 
-# Set working directory
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
-COPY tsconfig.json ./
+# System deps — minimal, the heavy lifting is in Stirling-PDF itself
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy TypeScript source
 COPY src/ ./src/
+COPY scripts/ ./scripts/
 
-# Build TypeScript
-RUN npm run build
+RUN mkdir -p /output /cache /data && \
+    chmod -R 0777 /output /cache /data
 
-# Remove dev dependencies after build
-RUN npm prune --production
+ENV OUTPUT_DIR=/output \
+    CACHE_DIR=/cache \
+    PYTHONPATH=/app/src \
+    PORT=8087 \
+    HOST=0.0.0.0
 
-# Set Node environment to production
-ENV NODE_ENV=production
+EXPOSE 8087
 
-# Create non-root user (use node user that already exists)
-RUN chown -R node:node /app
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -fsS http://localhost:8087/health || exit 1
 
-# Switch to non-root user
-USER node
-
-# Run the server
-CMD ["node", "dist/index.js"]
+CMD ["python", "-m", "stirling_mcp.server"]
