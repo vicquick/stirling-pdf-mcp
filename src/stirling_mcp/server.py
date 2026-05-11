@@ -16,9 +16,6 @@ from __future__ import annotations
 
 import logging
 
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-
 from stirling_mcp.app import mcp
 from stirling_mcp.config import SETTINGS
 
@@ -81,13 +78,6 @@ def _register_layers() -> None:
 
 
 _register_layers()
-
-
-@mcp.custom_route("/health", methods=["GET"])
-async def http_health(request: Request) -> JSONResponse:
-    """HTTP healthcheck endpoint. Always 200 OK; backend probe is the
-    `stirling_health` MCP tool."""
-    return JSONResponse({"status": "ok", "name": "stirling-pdf-mcp"})
 
 
 @mcp.tool()
