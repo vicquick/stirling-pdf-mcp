@@ -24,12 +24,6 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import httpx
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
 from stirling_mcp.config import SETTINGS
 
@@ -85,12 +79,6 @@ class StirlingClient:
     async def aclose(self) -> None:
         await self._client.aclose()
 
-    @retry(
-        retry=retry_if_exception_type(_RetryableHTTPError),
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1.5, min=1, max=15),
-        reraise=True,
-    )
     async def _do_request(
         self,
         method: str,
@@ -100,27 +88,43 @@ class StirlingClient:
         data: dict[str, Any] | list[tuple[str, str]] | None = None,
         params: dict[str, Any] | None = None,
     ) -> httpx.Response:
-        """Single HTTP attempt with retry wrapper. Raises StirlingError on non-2xx final."""
-        async with self._semaphore:
-            if isinstance(data, dict):
-                field_names = list(data.keys())
-            elif isinstance(data, list):
-                field_names = sorted({k for k, _ in data})
-            else:
-                field_names = []
-            log.debug("Stirling %s %s fields=%s files=%d", method, path, field_names, len(files or []))
-            resp = await self._client.request(
-                method,
-                path,
-                files=files,
-                data=data,
-                params=params,
-            )
-            if resp.status_code in _RETRYABLE_STATUS:
-                raise _RetryableHTTPError(
-                    f"transient {resp.status_code} on {path}"
+        """One async request with explicit exponential-backoff retry on transient 5xx."""
+        last_exc: Exception | None = None
+        delay = 1.0
+        for attempt in range(3):
+            async with self._semaphore:
+                if isinstance(data, dict):
+                    field_names = list(data.keys())
+                elif isinstance(data, list):
+                    field_names = sorted({k for k, _ in data})
+                else:
+                    field_names = []
+                log.debug(
+                    "Stirling %s %s fields=%s files=%d attempt=%d",
+                    method, path, field_names, len(files or []), attempt + 1,
                 )
-            return resp
+                try:
+                    resp = await self._client.request(
+                        method, path, files=files, data=data, params=params
+                    )
+                except (httpx.TimeoutException, httpx.NetworkError) as e:
+                    last_exc = e
+                    if attempt >= 2:
+                        raise
+                else:
+                    if resp.status_code in _RETRYABLE_STATUS and attempt < 2:
+                        log.warning(
+                            "Transient %s on %s, retry %d/3", resp.status_code, path, attempt + 2
+                        )
+                    else:
+                        return resp
+            # backoff before next attempt
+            await asyncio.sleep(delay)
+            delay *= 1.5
+        # exhausted retries — return last response if we have one, else raise
+        if last_exc:
+            raise last_exc
+        return resp  # type: ignore[possibly-undefined]
 
     async def post_form(
         self,
