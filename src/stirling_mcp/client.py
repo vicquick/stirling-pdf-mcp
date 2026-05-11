@@ -73,7 +73,6 @@ class StirlingClient:
             base_url=SETTINGS.stirling_url,
             timeout=timeout,
             headers=headers,
-            follow_redirects=True,
         )
 
     async def aclose(self) -> None:
