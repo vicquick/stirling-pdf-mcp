@@ -16,6 +16,9 @@ from __future__ import annotations
 
 import logging
 
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
 from stirling_mcp.app import mcp
 from stirling_mcp.config import SETTINGS
 
@@ -80,6 +83,13 @@ def _register_layers() -> None:
 _register_layers()
 
 
+@mcp.custom_route("/health", methods=["GET"])
+async def http_health(request: Request) -> JSONResponse:
+    """HTTP healthcheck endpoint. Always 200 OK; backend probe is the
+    `stirling_health` MCP tool."""
+    return JSONResponse({"status": "ok", "name": "stirling-pdf-mcp"})
+
+
 @mcp.tool()
 async def stirling_health() -> dict:
     """Probe the Stirling-PDF backend's health endpoint.
@@ -98,10 +108,19 @@ async def stirling_health() -> dict:
 
 
 if __name__ == "__main__":
+    import os
+
+    # FastMCP <0.5 reads host/port from FASTMCP_HOST / FASTMCP_PORT env vars
+    os.environ.setdefault("FASTMCP_HOST", SETTINGS.host)
+    os.environ.setdefault("FASTMCP_PORT", str(SETTINGS.port))
     log.info(
         "Starting Stirling-PDF MCP on %s:%d → backend %s",
         SETTINGS.host,
         SETTINGS.port,
         SETTINGS.stirling_url,
     )
-    mcp.run(transport="streamable-http", host=SETTINGS.host, port=SETTINGS.port)
+    # Pass host/port if FastMCP accepts them, else they're already in env
+    try:
+        mcp.run(transport="streamable-http", host=SETTINGS.host, port=SETTINGS.port)
+    except TypeError:
+        mcp.run(transport="streamable-http")
