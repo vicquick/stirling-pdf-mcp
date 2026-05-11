@@ -79,7 +79,7 @@ async def expense_report(
         ocr_outputs.append(ocr_path)
 
         txt = await client.post_form(
-            "/api/v1/misc/extract-text",
+            "/api/v1/convert/pdf/text",
             input_files=[ocr_path],
             form_data={"outputFormat": "txt"},
             output_suffix=".txt",

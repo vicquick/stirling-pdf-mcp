@@ -152,7 +152,7 @@ async def redact_personal_info(
         if ocr_first == "auto":
             try:
                 extract = await client.post_form(
-                    "/api/v1/misc/extract-text",
+                    "/api/v1/convert/pdf/text",
                     input_files=[work_file],
                     form_data={"outputFormat": "txt"},
                     output_suffix=".txt",

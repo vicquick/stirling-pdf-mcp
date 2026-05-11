@@ -117,7 +117,7 @@ async def pdf_extract_text(
     `extract_searchable_text` which OCRs if needed then extracts.
     """
     return await get_client().post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[Path(input_file)],
         form_data={"outputFormat": output_format},
         output_suffix=f".{output_format}",

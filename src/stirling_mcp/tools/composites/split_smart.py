@@ -119,7 +119,7 @@ async def pdf_split_smart(
         # and look for marker patterns, count their positions, return as
         # boundary hints.
         txt = await client.post_form(
-            "/api/v1/misc/extract-text",
+            "/api/v1/convert/pdf/text",
             input_files=[work],
             form_data={"outputFormat": "txt"},
             output_suffix=".txt",

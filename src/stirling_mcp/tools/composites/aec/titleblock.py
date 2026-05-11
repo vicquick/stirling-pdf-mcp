@@ -57,7 +57,7 @@ async def aec_titleblock_to_metadata(
             chained.append("ocr-pdf")
 
     txt = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[work],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",

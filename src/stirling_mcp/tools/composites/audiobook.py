@@ -80,7 +80,7 @@ async def pdf_book_to_audiobook(
         work = Path(no_blank["output_path"])
 
     txt = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[work],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",

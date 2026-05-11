@@ -66,7 +66,7 @@ async def pdf_to_memory(
             work = Path(ocr["output_path"])
 
     txt = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[work],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",

@@ -26,14 +26,14 @@ async def compare_versions(file_a: str, file_b: str) -> dict:
     client = get_client()
 
     text_a_res = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[Path(file_a)],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",
         output_name_hint="compare-a",
     )
     text_b_res = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[Path(file_b)],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",

@@ -108,7 +108,7 @@ async def invoice_prepare(
 
     # 2. Extract text
     txt_result = await client.post_form(
-        "/api/v1/misc/extract-text",
+        "/api/v1/convert/pdf/text",
         input_files=[work_file],
         form_data={"outputFormat": "txt"},
         output_suffix=".txt",

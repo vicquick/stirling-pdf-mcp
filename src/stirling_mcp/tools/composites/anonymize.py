@@ -59,14 +59,9 @@ async def pdf_anonymize(
         work = Path(san["output_path"])
         chained.append("sanitize-pdf")
 
-    anno = await client.post_form(
-        "/api/v1/misc/remove-annotations",
-        input_files=[work],
-        output_name_hint="anon-no-anno",
-    )
-    if anno.get("success"):
-        work = Path(anno["output_path"])
-        chained.append("remove-annotations")
+    # Note: Stirling 2.10.1 doesn't expose a standalone /misc/remove-annotations
+    # endpoint — sanitize-pdf + flatten cover the same ground (annotations
+    # become baked-in content + lose any interactive behaviour).
 
     meta = await client.post_form(
         "/api/v1/misc/update-metadata",
