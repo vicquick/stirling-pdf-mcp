@@ -252,7 +252,7 @@ def main() -> int:
         '"""\n\n'
         "from __future__ import annotations\n\n"
         "from stirling_mcp.client import get_client\n"
-        "from stirling_mcp.server import mcp\n"
+        "from stirling_mcp.app import mcp\n"
     )
 
     written: list[str] = []

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Literal
 
 from stirling_mcp.client import get_client
-from stirling_mcp.server import mcp
+from stirling_mcp.app import mcp
 
 
 @mcp.tool()

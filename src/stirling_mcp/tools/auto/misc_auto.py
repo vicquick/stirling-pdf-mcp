@@ -6,7 +6,7 @@ Generated from the live Stirling OpenAPI spec. See ``scripts/gen_tools.py``.
 from __future__ import annotations
 
 from stirling_mcp.client import get_client
-from stirling_mcp.server import mcp
+from stirling_mcp.app import mcp
 
 @mcp.tool()
 async def misc_show_javascript(

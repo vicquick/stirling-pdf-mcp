@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import logging
 
-from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from stirling_mcp.app import mcp
 from stirling_mcp.config import SETTINGS
 
 logging.basicConfig(
@@ -27,21 +27,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 log = logging.getLogger("stirling_mcp")
-
-
-mcp = FastMCP(
-    "stirling-pdf",
-    instructions=(
-        "Stirling-PDF MCP server. Exposes the full Stirling-PDF 2.10+ surface "
-        "(260 REST operations) as 1:1 tools, plus 28 composite workflow tools "
-        "for high-value patterns (invoice prep, GDPR/HIPAA redaction, PDF/A "
-        "archive, signing ceremonies, AEC drawing sets, cross-MCP integrations "
-        "with QGIS / IFC / Blender / Flux / SVG / nobrainr). When a user asks "
-        "for any PDF operation, prefer the most specific composite if one fits, "
-        "else fall back to the raw endpoint wrapper. Inputs are file paths; "
-        "outputs are saved to OUTPUT_DIR and returned as `output_path`."
-    ),
-)
 
 
 def _register_layers() -> None:

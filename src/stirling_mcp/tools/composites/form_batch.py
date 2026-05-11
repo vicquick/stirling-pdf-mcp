@@ -8,7 +8,7 @@ from pathlib import Path
 
 from stirling_mcp.client import get_client
 from stirling_mcp.config import SETTINGS
-from stirling_mcp.server import mcp
+from stirling_mcp.app import mcp
 
 log = logging.getLogger("stirling_mcp.composites.form_batch")
 
