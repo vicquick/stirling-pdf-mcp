@@ -213,7 +213,7 @@ async def redact_personal_info(
 
     # 5. Watermark
     wm_result = await client.post_form(
-        "/api/v1/misc/add-watermark",
+        "/api/v1/security/add-watermark",
         input_files=[work_file],
         form_data={
             "watermarkText": watermark_label,

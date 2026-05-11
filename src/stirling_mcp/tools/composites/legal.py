@@ -98,7 +98,7 @@ async def legal_packet(
 
     # 4. Watermark
     wm = await client.post_form(
-        "/api/v1/misc/add-watermark",
+        "/api/v1/security/add-watermark",
         input_files=[work],
         form_data={
             "watermarkText": watermark_text,

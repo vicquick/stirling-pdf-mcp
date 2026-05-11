@@ -197,7 +197,7 @@ async def pdf_add_watermark(
     Colour accepts hex (`#RRGGBB`). Rotation in degrees.
     """
     return await get_client().post_form(
-        "/api/v1/misc/add-watermark",
+        "/api/v1/security/add-watermark",
         input_files=[Path(input_file)],
         form_data={
             "watermarkText": watermark_text,

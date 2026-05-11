@@ -67,7 +67,7 @@ async def aec_submittal_package(
         chained.append("bates-numbering")
 
     wm = await client.post_form(
-        "/api/v1/misc/add-watermark",
+        "/api/v1/security/add-watermark",
         input_files=[work],
         form_data={
             "watermarkText": watermark_text,

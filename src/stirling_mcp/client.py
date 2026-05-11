@@ -194,20 +194,31 @@ class StirlingClient:
         }
 
     @staticmethod
-    def _sanitise_form(d: dict[str, Any]) -> dict[str, str]:
-        """Stirling form fields must be strings. Drop None, coerce bools, json-encode lists."""
+    def _sanitise_form(d: dict[str, Any]) -> list[tuple[str, str]]:
+        """Coerce a dict into a list of (key, value) form pairs.
+
+        Returns a *list of tuples* rather than a dict because some Stirling
+        endpoints (auto-redact, ocr languages) expect the same field name to
+        repeat once per value — Spring binds these into a List<String>. A dict
+        would collapse them to one key, and JSON-encoding the list would make
+        Stirling parse the literal ``[...]`` as one element.
+        """
         import json
 
-        out: dict[str, str] = {}
+        out: list[tuple[str, str]] = []
         for k, v in d.items():
             if v is None:
                 continue
             if isinstance(v, bool):
-                out[k] = "true" if v else "false"
-            elif isinstance(v, (list, dict)):
-                out[k] = json.dumps(v)
+                out.append((k, "true" if v else "false"))
+            elif isinstance(v, list):
+                # Repeat the field per element so Spring binds it as a list
+                for item in v:
+                    out.append((k, str(item)))
+            elif isinstance(v, dict):
+                out.append((k, json.dumps(v)))
             else:
-                out[k] = str(v)
+                out.append((k, str(v)))
         return out
 
     async def _save_response(

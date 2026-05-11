@@ -17,10 +17,14 @@ from stirling_mcp.app import mcp
 log = logging.getLogger("stirling_mcp.composites.aec.drawing_set")
 
 
-# AEC sheet numbering convention — A-101, M-201, etc. — discipline letter +
-# 3-digit number. Adjust as needed for project-specific schemes.
-SHEET_NUM_RE = re.compile(r"\b([A-Z]{1,2})-?(\d{2,4}(?:\.\d+)?)\b")
-REV_RE = re.compile(r"(?:rev|r|revision)[._\- ]*(\d+|[A-Z])", re.IGNORECASE)
+# AEC sheet numbering convention — A-101, A_101, A101, M-201.1, etc.
+# Discipline letter(s) + optional dash/underscore + 3-4 digit number, optionally
+# a decimal suffix (A-101.2 = sub-sheet of A-101).
+SHEET_NUM_RE = re.compile(r"\b([A-Z]{1,2})[-_]?(\d{2,4}(?:\.\d+)?)\b")
+# Revision must come AFTER an explicit "rev" / "r" / "revision" tag — bare
+# letters near filenames give too many false positives ("rev2" is OK,
+# "(case_a)" is not).
+REV_RE = re.compile(r"(?:^|[._\-])(?:rev|r)[._\- ]?(\d+|[A-Z])\b", re.IGNORECASE)
 
 
 @mcp.tool()

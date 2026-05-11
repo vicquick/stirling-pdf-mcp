@@ -13,7 +13,7 @@ from stirling_mcp.app import mcp
 log = logging.getLogger("stirling_mcp.composites.aec.titleblock")
 
 
-SHEET_RE = re.compile(r"\b([A-Z]{1,2}[-]?\d{2,4}(?:\.\d+)?)\b")
+SHEET_RE = re.compile(r"\b([A-Z]{1,2}[-_]?\d{2,4}(?:\.\d+)?)\b")
 SCALE_RE = re.compile(r"\b(?:scale|maßstab|échelle)\s*[:=]?\s*([0-9]+\s*[:=]\s*[0-9]+)\b", re.IGNORECASE)
 DATE_RE = re.compile(r"\b([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}[./-][0-9]{1,2}[./-][0-9]{2,4})\b")
 PROJECT_RE = re.compile(r"(?:Project|Projekt|Projet)[:\s]+([A-Z][A-Za-z0-9 .,&\-]{3,60})")
